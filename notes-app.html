@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Default Theme */
+        body[data-theme="default"] {
+            --bg-color: #f5f5f7;
+            --text-color: #1d1d1f;
+            --card-bg: white;
+            --primary-color: #007aff;
+            --secondary-color: #f5f5f7;
+            --border-color: #d2d2d7;
+            --muted-color: #86868b;
+            --delete-color: #ff3b30;
+        }
+
+        /* Dark Mode */
+        body[data-theme="dark"] {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --card-bg: #1c1c1e;
+            --primary-color: #0a84ff;
+            --secondary-color: #2c2c2e;
+            --border-color: #38383a;
+            --muted-color: #98989d;
+            --delete-color: #ff453a;
+        }
+
+        /* Ocean Theme */
+        body[data-theme="ocean"] {
+            --bg-color: #e0f2f7;
+            --text-color: #01579b;
+            --card-bg: #ffffff;
+            --primary-color: #0277bd;
+            --secondary-color: #b3e5fc;
+            --border-color: #81d4fa;
+            --muted-color: #4fc3f7;
+            --delete-color: #d32f2f;
+        }
+
+        /* Sunset Theme */
+        body[data-theme="sunset"] {
+            --bg-color: #fff3e0;
+            --text-color: #bf360c;
+            --card-bg: #ffffff;
+            --primary-color: #ff6f00;
+            --secondary-color: #ffe0b2;
+            --border-color: #ffcc80;
+            --muted-color: #fb8c00;
+            --delete-color: #c62828;
+        }
+
+        /* Forest Theme */
+        body[data-theme="forest"] {
+            --bg-color: #e8f5e9;
+            --text-color: #1b5e20;
+            --card-bg: #ffffff;
+            --primary-color: #2e7d32;
+            --secondary-color: #c8e6c9;
+            --border-color: #a5d6a7;
+            --muted-color: #66bb6a;
+            --delete-color: #c62828;
+        }
+
+        /* Purple Dream */
+        body[data-theme="purple"] {
+            --bg-color: #f3e5f5;
+            --text-color: #4a148c;
+            --card-bg: #ffffff;
+            --primary-color: #7b1fa2;
+            --secondary-color: #e1bee7;
+            --border-color: #ce93d8;
+            --muted-color: #ab47bc;
+            --delete-color: #c62828;
+        }
+
+        /* Cyberpunk */
+        body[data-theme="cyberpunk"] {
+            --bg-color: #0a0e27;
+            --text-color: #00ff9f;
+            --card-bg: #1a1d3a;
+            --primary-color: #ff2e97;
+            --secondary-color: #2d3250;
+            --border-color: #00ff9f;
+            --muted-color: #b026ff;
+            --delete-color: #ff2e97;
+        }
+
+        /* Pastel Pink */
+        body[data-theme="pastel"] {
+            --bg-color: #fce4ec;
+            --text-color: #880e4f;
+            --card-bg: #ffffff;
+            --primary-color: #ec407a;
+            --secondary-color: #f8bbd0;
+            --border-color: #f48fb1;
+            --muted-color: #f06292;
+            --delete-color: #c62828;
+        }
+
+        /* Coffee Theme */
+        body[data-theme="coffee"] {
+            --bg-color: #efebe9;
+            --text-color: #3e2723;
+            --card-bg: #ffffff;
+            --primary-color: #5d4037;
+            --secondary-color: #d7ccc8;
+            --border-color: #bcaaa4;
+            --muted-color: #8d6e63;
+            --delete-color: #c62828;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        header {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .search-filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .new-note-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+            z-index: 100;
+        }
+
+        .new-note-btn:active {
+            transform: scale(0.95);
+        }
+
+        .notes-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .note-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .note-card:active {
+            transform: scale(0.98);
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .note-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .note-date {
+            font-size: 12px;
+            color: var(--muted-color);
+        }
+
+        .note-content {
+            font-size: 14px;
+            color: var(--muted-color);
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .note-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            background: var(--secondary-color);
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--primary-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+        }
+
+        .close-btn, .delete-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--muted-color);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn {
+            color: var(--delete-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .form-group textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--card-bg);
+        }
+
+        .tag-input-container input {
+            flex: 1;
+            min-width: 120px;
+            border: none;
+            padding: 4px;
+            font-size: 14px;
+            background: transparent;
+            color: var(--text-color);
+        }
+
+        .tag-input-container input:focus {
+            outline: none;
+        }
+
+        .tag-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .tag-remove {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .save-btn:active {
+            opacity: 0.8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted-color);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-text {
+            font-size: 18px;
+        }
+
+        .theme-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            z-index: 100;
+        }
+
+        .theme-btn:active {
+            transform: scale(0.95);
+        }
+
+        .theme-menu {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            z-index: 99;
+            display: none;
+            min-width: 180px;
+        }
+
+        .theme-menu.active {
+            display: block;
+            animation: fadeIn 0.2s;
+        }
+
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+
+        .theme-option:hover {
+            background: var(--secondary-color);
+        }
+
+        .theme-option.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .theme-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>My Notes</h1>
+        </header>
+
+        <div class="search-filter-bar">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search notes...">
+            <div class="filter-buttons" id="filterButtons"></div>
+        </div>
+
+        <div class="notes-grid" id="notesGrid"></div>
+    </div>
+
+    <button class="new-note-btn" id="newNoteBtn">+</button>
+    <button class="theme-btn" id="themeBtn">🎨</button>
+
+    <div class="theme-menu" id="themeMenu">
+        <div class="theme-option" data-theme="default">
+            <div class="theme-color" style="background: #007aff;"></div>
+            <span>Default</span>
+        </div>
+        <div class="theme-option" data-theme="dark">
+            <div class="theme-color" style="background: linear-gradient(135deg, #000 50%, #0a84ff 50%);"></div>
+            <span>Dark Mode</span>
+        </div>
+        <div class="theme-option" data-theme="ocean">
+            <div class="theme-color" style="background: linear-gradient(135deg, #0277bd, #81d4fa);"></div>
+            <span>Ocean</span>
+        </div>
+        <div class="theme-option" data-theme="sunset">
+            <div class="theme-color" style="background: linear-gradient(135deg, #ff6f00, #ffcc80);"></div>
+            <span>Sunset</span>
+        </div>
+        <div class="theme-option" data-theme="forest">
+            <div class="theme-color" style="background: linear-gradient(135deg, #2e7d32, #a5d6a7);"></div>
+            <span>Forest</span>
+        </div>
+        <div class="theme-option" data-theme="purple">
+            <div class="theme-color" style="background: linear-gradient(135deg, #7b1fa2, #ce93d8);"></div>
+            <span>Purple Dream</span>
+        </div>
+        <div class="theme-option" data-theme="cyberpunk">
+            <div class="theme-color" style="background: linear-gradient(135deg, #ff2e97, #00ff9f);"></div>
+            <span>Cyberpunk</span>
+        </div>
+        <div class="theme-option" data-theme="pastel">
+            <div class="theme-color" style="background: linear-gradient(135deg, #ec407a, #f8bbd0);"></div>
+            <span>Pastel Pink</span>
+        </div>
+        <div class="theme-option" data-theme="coffee">
+            <div class="theme-color" style="background: linear-gradient(135deg, #5d4037, #bcaaa4);"></div>
+            <span>Coffee</span>
+        </div>
+    </div>
+
+    <div class="modal" id="noteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">New Note</h2>
+                <div style="display: flex; gap: 12px;">
+                    <button class="delete-btn" id="deleteBtn" style="display: none;">🗑️</button>
+                    <button class="close-btn" id="closeBtn">×</button>
+                </div>
+            </div>
+            <form id="noteForm">
+                <div class="form-group">
+                    <label for="noteTitle">Title</label>
+                    <input type="text" id="noteTitle" placeholder="Enter title..." required>
+                </div>
+                <div class="form-group">
+                    <label for="noteContent">Content</label>
+                    <textarea id="noteContent" placeholder="Write your note..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Tags</label>
+                    <div class="tag-input-container" id="tagContainer">
+                        <input type="text" id="tagInput" placeholder="Add tag...">
+                    </div>
+                </div>
+                <button type="submit" class="save-btn">Save Note</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        class NotesApp {
+            constructor() {
+                this.notes = JSON.parse(localStorage.getItem('notes')) || [];
+                this.currentFilter = 'all';
+                this.currentNoteId = null;
+                this.tags = [];
+                this.currentTheme = localStorage.getItem('theme') || 'default';
+                
+                this.initElements();
+                this.initEventListeners();
+                this.applyTheme(this.currentTheme);
+                this.render();
+            }
+
+            initElements() {
+                this.notesGrid = document.getElementById('notesGrid');
+                this.newNoteBtn = document.getElementById('newNoteBtn');
+                this.noteModal = document.getElementById('noteModal');
+                this.closeBtn = document.getElementById('closeBtn');
+                this.deleteBtn = document.getElementById('deleteBtn');
+                this.noteForm = document.getElementById('noteForm');
+                this.searchBox = document.getElementById('searchBox');
+                this.filterButtons = document.getElementById('filterButtons');
+                this.modalTitle = document.getElementById('modalTitle');
+                this.noteTitle = document.getElementById('noteTitle');
+                this.noteContent = document.getElementById('noteContent');
+                this.tagInput = document.getElementById('tagInput');
+                this.tagContainer = document.getElementById('tagContainer');
+                this.themeBtn = document.getElementById('themeBtn');
+                this.themeMenu = document.getElementById('themeMenu');
+            }
+
+            initEventListeners() {
+                this.newNoteBtn.addEventListener('click', () => this.openModal());
+                this.closeBtn.addEventListener('click', () => this.closeModal());
+                this.deleteBtn.addEventListener('click', () => this.deleteNote());
+                this.noteForm.addEventListener('submit', (e) => this.saveNote(e));
+                this.searchBox.addEventListener('input', () => this.render());
+                this.noteModal.addEventListener('click', (e) => {
+                    if (e.target === this.noteModal) this.closeModal();
+                });
+                
+                this.tagInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        this.addTag();
+                    }
+                });
+
+                this.themeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.themeMenu.classList.toggle('active');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!this.themeMenu.contains(e.target) && e.target !== this.themeBtn) {
+                        this.themeMenu.classList.remove('active');
+                    }
+                });
+
+                document.querySelectorAll('.theme-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        const theme = option.dataset.theme;
+                        this.applyTheme(theme);
+                        this.themeMenu.classList.remove('active');
+                    });
+                });
+            }
+
+            applyTheme(theme) {
+                this.currentTheme = theme;
+                document.body.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                
+                // Update active state in theme menu
+                document.querySelectorAll('.theme-option').forEach(option => {
+                    if (option.dataset.theme === theme) {
+                        option.classList.add('active');
+                    } else {
+                        option.classList.remove('active');
+                    }
+                });
+            }
+
+            openModal(noteId = null) {
+                this.currentNoteId = noteId;
+                
+                if (noteId) {
+                    const note = this.notes.find(n => n.id === noteId);
+                    this.modalTitle.textContent = 'Edit Note';
+                    this.noteTitle.value = note.title;
+                    this.noteContent.value = note.content;
+                    this.tags = [...note.tags];
+                    this.deleteBtn.style.display = 'block';
+                } else {
+                    this.modalTitle.textContent = 'New Note';
+                    this.noteTitle.value = '';
+                    this.noteContent.value = '';
+                    this.tags = [];
+                    this.deleteBtn.style.display = 'none';
+                }
+                
+                this.renderTags();
+                this.noteModal.classList.add('active');
+            }
+
+            closeModal() {
+                this.noteModal.classList.remove('active');
+                this.currentNoteId = null;
+                this.tags = [];
+            }
+
+            addTag() {
+                const value = this.tagInput.value.trim().replace(',', '');
+                if (value && !this.tags.includes(value)) {
+                    this.tags.push(value);
+                    this.tagInput.value = '';
+                    this.renderTags();
+                }
+            }
+
+            removeTag(tag) {
+                this.tags = this.tags.filter(t => t !== tag);
+                this.renderTags();
+            }
+
+            renderTags() {
+                const existingInput = this.tagInput;
+                this.tagContainer.innerHTML = '';
+                
+                this.tags.forEach(tag => {
+                    const tagEl = document.createElement('div');
+                    tagEl.className = 'tag-item';
+                    tagEl.innerHTML = `
+                        ${tag}
+                        <button type="button" class="tag-remove">×</button>
+                    `;
+                    tagEl.querySelector('.tag-remove').addEventListener('click', () => this.removeTag(tag));
+                    this.tagContainer.appendChild(tagEl);
+                });
+                
+                this.tagContainer.appendChild(existingInput);
+            }
+
+            saveNote(e) {
+                e.preventDefault();
+                
+                const note = {
+                    id: this.currentNoteId || Date.now(),
+                    title: this.noteTitle.value,
+                    content: this.noteContent.value,
+                    tags: this.tags,
+                    date: new Date().toISOString()
+                };
+
+                if (this.currentNoteId) {
+                    const index = this.notes.findIndex(n => n.id === this.currentNoteId);
+                    this.notes[index] = note;
+                } else {
+                    this.notes.unshift(note);
+                }
+
+                this.saveToStorage();
+                this.closeModal();
+                this.render();
+            }
+
+            deleteNote() {
+                if (confirm('Delete this note?')) {
+                    this.notes = this.notes.filter(n => n.id !== this.currentNoteId);
+                    this.saveToStorage();
+                    this.closeModal();
+                    this.render();
+                }
+            }
+
+            saveToStorage() {
+                localStorage.setItem('notes', JSON.stringify(this.notes));
+            }
+
+            getAllTags() {
+                const allTags = new Set();
+                this.notes.forEach(note => {
+                    note.tags.forEach(tag => allTags.add(tag));
+                });
+                return Array.from(allTags).sort();
+            }
+
+            renderFilters() {
+                const allTags = this.getAllTags();
+                this.filterButtons.innerHTML = `
+                    <button class="filter-btn ${this.currentFilter === 'all' ? 'active' : ''}" data-filter="all">
+                        All
+                    </button>
+                `;
+                
+                allTags.forEach(tag => {
+                    const btn = document.createElement('button');
+                    btn.className = `filter-btn ${this.currentFilter === tag ? 'active' : ''}`;
+                    btn.textContent = tag;
+                    btn.dataset.filter = tag;
+                    this.filterButtons.appendChild(btn);
+                });
+
+                this.filterButtons.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.currentFilter = btn.dataset.filter;
+                        this.render();
+                    });
+                });
+            }
+
+            getFilteredNotes() {
+                let filtered = this.notes;
+
+                // Apply tag filter
+                if (this.currentFilter !== 'all') {
+                    filtered = filtered.filter(note => note.tags.includes(this.currentFilter));
+                }
+
+                // Apply search
+                const searchTerm = this.searchBox.value.toLowerCase();
+                if (searchTerm) {
+                    filtered = filtered.filter(note => 
+                        note.title.toLowerCase().includes(searchTerm) ||
+                        note.content.toLowerCase().includes(searchTerm) ||
+                        note.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+                    );
+                }
+
+                return filtered;
+            }
+
+            formatDate(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffTime = Math.abs(now - date);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 0) {
+                    return 'Today';
+                } else if (diffDays === 1) {
+                    return 'Yesterday';
+                } else if (diffDays < 7) {
+                    return `${diffDays} days ago`;
+                } else {
+                    return date.toLocaleDateString();
+                }
+            }
+
+            render() {
+                this.renderFilters();
+                const filteredNotes = this.getFilteredNotes();
+
+                if (filteredNotes.length === 0) {
+                    this.notesGrid.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📝</div>
+                            <div class="empty-state-text">
+                                ${this.notes.length === 0 ? 'No notes yet. Tap + to create one!' : 'No notes found'}
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                this.notesGrid.innerHTML = filteredNotes.map(note => `
+                    <div class="note-card" data-id="${note.id}">
+                        <div class="note-header">
+                            <div class="note-title">${this.escapeHtml(note.title)}</div>
+                        </div>
+                        <div class="note-date">${this.formatDate(note.date)}</div>
+                        <div class="note-content">${this.escapeHtml(note.content)}</div>
+                        ${note.tags.length > 0 ? `
+                            <div class="note-tags">
+                                ${note.tags.map(tag => `<span class="tag">${this.escapeHtml(tag)}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+
+                this.notesGrid.querySelectorAll('.note-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        this.openModal(parseInt(card.dataset.id));
+                    });
+                });
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        // Initialize app
+        new NotesApp();
+    </script>
+</body>
+</html>
