@@ -570,7 +570,7 @@
         }
     </style>
 </head>
-<body>
+<body data-theme="default">
     <div class="container">
         <header>
             <h1>My Notes</h1>
@@ -599,7 +599,7 @@
         </div>
         <div class="theme-option" data-theme="ocean">
             <div class="theme-color" style="background: linear-gradient(135deg, #0277bd, #81d4fa);"></div>
-            <span>Ocean</span>
+            <span>Ocean 🌊</span>
         </div>
         <div class="theme-option" data-theme="sunset">
             <div class="theme-color" style="background: linear-gradient(135deg, #ff6f00, #ffcc80);"></div>
@@ -607,7 +607,7 @@
         </div>
         <div class="theme-option" data-theme="forest">
             <div class="theme-color" style="background: linear-gradient(135deg, #2e7d32, #a5d6a7);"></div>
-            <span>Forest</span>
+            <span>Forest 🌲</span>
         </div>
         <div class="theme-option" data-theme="purple">
             <div class="theme-color" style="background: linear-gradient(135deg, #7b1fa2, #ce93d8);"></div>
@@ -665,6 +665,179 @@
     </div>
 
     <script>
+        class AmbientSoundGenerator {
+            constructor() {
+                this.audioContext = null;
+                this.nodes = [];
+                this.isPlaying = false;
+            }
+
+            init() {
+                if (!this.audioContext) {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            stop() {
+                this.nodes.forEach(node => {
+                    if (node.stop) node.stop();
+                    if (node.disconnect) node.disconnect();
+                });
+                this.nodes = [];
+                this.isPlaying = false;
+            }
+
+            playOcean() {
+                this.init();
+                this.stop();
+                
+                // Create multiple white noise oscillators at different frequencies to simulate ocean
+                for (let i = 0; i < 3; i++) {
+                    const bufferSize = 4096;
+                    const whiteNoise = this.audioContext.createScriptProcessor(bufferSize, 1, 1);
+                    
+                    whiteNoise.onaudioprocess = function(e) {
+                        const output = e.outputBuffer.getChannelData(0);
+                        for (let i = 0; i < bufferSize; i++) {
+                            output[i] = (Math.random() * 2 - 1) * 0.1;
+                        }
+                    };
+
+                    const filter = this.audioContext.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 200 + (i * 100);
+                    
+                    const gainNode = this.audioContext.createGain();
+                    gainNode.gain.value = 0.05;
+                    
+                    whiteNoise.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    
+                    this.nodes.push(whiteNoise, filter, gainNode);
+                }
+                
+                this.isPlaying = true;
+            }
+
+            playRain() {
+                this.init();
+                this.stop();
+                
+                // Simulate rain with filtered white noise
+                const bufferSize = 4096;
+                const whiteNoise = this.audioContext.createScriptProcessor(bufferSize, 1, 1);
+                
+                whiteNoise.onaudioprocess = function(e) {
+                    const output = e.outputBuffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        output[i] = (Math.random() * 2 - 1) * 0.15;
+                    }
+                };
+
+                const filter = this.audioContext.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 1000;
+                filter.Q.value = 0.5;
+                
+                const gainNode = this.audioContext.createGain();
+                gainNode.gain.value = 0.1;
+                
+                whiteNoise.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                this.nodes.push(whiteNoise, filter, gainNode);
+                this.isPlaying = true;
+            }
+
+            playForest() {
+                this.init();
+                this.stop();
+                
+                // Base ambient sound
+                const bufferSize = 4096;
+                const whiteNoise = this.audioContext.createScriptProcessor(bufferSize, 1, 1);
+                
+                whiteNoise.onaudioprocess = function(e) {
+                    const output = e.outputBuffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        output[i] = (Math.random() * 2 - 1) * 0.05;
+                    }
+                };
+
+                const filter = this.audioContext.createBiquadFilter();
+                filter.type = 'highpass';
+                filter.frequency.value = 500;
+                
+                const gainNode = this.audioContext.createGain();
+                gainNode.gain.value = 0.08;
+                
+                whiteNoise.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                // Random bird chirps
+                const playChirp = () => {
+                    if (!this.isPlaying) return;
+                    
+                    const osc = this.audioContext.createOscillator();
+                    const chirpGain = this.audioContext.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.value = 1000 + Math.random() * 1000;
+                    
+                    chirpGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+                    chirpGain.gain.linearRampToValueAtTime(0.1, this.audioContext.currentTime + 0.01);
+                    chirpGain.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 0.1);
+                    
+                    osc.connect(chirpGain);
+                    chirpGain.connect(this.audioContext.destination);
+                    
+                    osc.start();
+                    osc.stop(this.audioContext.currentTime + 0.1);
+                    
+                    setTimeout(playChirp, 2000 + Math.random() * 3000);
+                };
+                
+                this.nodes.push(whiteNoise, filter, gainNode);
+                this.isPlaying = true;
+                playChirp();
+            }
+
+            playFireplace() {
+                this.init();
+                this.stop();
+                
+                // Crackling fire sound
+                const bufferSize = 4096;
+                const crackle = this.audioContext.createScriptProcessor(bufferSize, 1, 1);
+                
+                crackle.onaudioprocess = function(e) {
+                    const output = e.outputBuffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        // Random pops and crackles
+                        output[i] = (Math.random() > 0.99 ? Math.random() * 0.5 : 0) + 
+                                   (Math.random() * 2 - 1) * 0.03;
+                    }
+                };
+
+                const filter = this.audioContext.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 400;
+                
+                const gainNode = this.audioContext.createGain();
+                gainNode.gain.value = 0.15;
+                
+                crackle.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                this.nodes.push(crackle, filter, gainNode);
+                this.isPlaying = true;
+            }
+        }
+
         class NotesApp {
             constructor() {
                 this.notes = JSON.parse(localStorage.getItem('notes')) || [];
@@ -672,17 +845,10 @@
                 this.currentNoteId = null;
                 this.tags = [];
                 this.currentTheme = localStorage.getItem('theme') || 'default';
-                this.audioContext = null;
-                this.currentSound = null;
+                this.soundGenerator = new AmbientSoundGenerator();
                 this.soundPlaying = false;
                 
-                // Define themes with ambient sounds
-                this.themeSounds = {
-                    'ocean': { url: 'https://cdn.freesound.org/previews/393/393878_2627411-lq.mp3', name: 'Ocean Waves' },
-                    'rain': { url: 'https://cdn.freesound.org/previews/523/523277_11389365-lq.mp3', name: 'Rain' },
-                    'forest': { url: 'https://cdn.freesound.org/previews/416/416529_5121236-lq.mp3', name: 'Forest Birds' },
-                    'fireplace': { url: 'https://cdn.freesound.org/previews/242/242747_2615119-lq.mp3', name: 'Fireplace' }
-                };
+                this.themesWithSounds = ['ocean', 'rain', 'forest', 'fireplace'];
                 
                 this.initElements();
                 this.initEventListeners();
@@ -759,33 +925,34 @@
             }
 
             playSound() {
-                const soundData = this.themeSounds[this.currentTheme];
-                if (!soundData) return;
-
-                // Stop current sound if any
-                this.stopSound();
-
-                // Create audio element
-                this.currentSound = new Audio(soundData.url);
-                this.currentSound.loop = true;
-                this.currentSound.volume = 0.5;
-
-                // Play sound
-                this.currentSound.play().then(() => {
-                    this.soundPlaying = true;
-                    this.soundBtn.classList.add('playing');
-                    this.soundBtn.textContent = '🔊';
-                }).catch(err => {
-                    console.error('Error playing sound:', err);
-                });
+                const theme = this.currentTheme;
+                
+                this.soundGenerator.stop();
+                
+                switch(theme) {
+                    case 'ocean':
+                        this.soundGenerator.playOcean();
+                        break;
+                    case 'rain':
+                        this.soundGenerator.playRain();
+                        break;
+                    case 'forest':
+                        this.soundGenerator.playForest();
+                        break;
+                    case 'fireplace':
+                        this.soundGenerator.playFireplace();
+                        break;
+                    default:
+                        return;
+                }
+                
+                this.soundPlaying = true;
+                this.soundBtn.classList.add('playing');
+                this.soundBtn.textContent = '🔊';
             }
 
             stopSound() {
-                if (this.currentSound) {
-                    this.currentSound.pause();
-                    this.currentSound.currentTime = 0;
-                    this.currentSound = null;
-                }
+                this.soundGenerator.stop();
                 this.soundPlaying = false;
                 this.soundBtn.classList.remove('playing');
                 this.soundBtn.textContent = '🔇';
@@ -800,7 +967,7 @@
                 localStorage.setItem('theme', theme);
                 
                 // Show sound button only for themes with sounds
-                if (this.themeSounds[theme]) {
+                if (this.themesWithSounds.includes(theme)) {
                     this.soundBtn.classList.add('active');
                 } else {
                     this.soundBtn.classList.remove('active');
