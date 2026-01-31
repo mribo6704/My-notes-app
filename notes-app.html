@@ -134,6 +134,30 @@
             --delete-color: #c62828;
         }
 
+        /* Rain Theme */
+        body[data-theme="rain"] {
+            --bg-color: #e3f2fd;
+            --text-color: #1565c0;
+            --card-bg: #ffffff;
+            --primary-color: #1976d2;
+            --secondary-color: #bbdefb;
+            --border-color: #90caf9;
+            --muted-color: #42a5f5;
+            --delete-color: #c62828;
+        }
+
+        /* Fireplace Theme */
+        body[data-theme="fireplace"] {
+            --bg-color: #fbe9e7;
+            --text-color: #bf360c;
+            --card-bg: #ffffff;
+            --primary-color: #d84315;
+            --secondary-color: #ffccbc;
+            --border-color: #ffab91;
+            --muted-color: #ff7043;
+            --delete-color: #c62828;
+        }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -511,6 +535,39 @@
             border-radius: 50%;
             border: 2px solid var(--border-color);
         }
+
+        .sound-btn {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            z-index: 100;
+            display: none;
+        }
+
+        .sound-btn.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sound-btn:active {
+            transform: scale(0.95);
+        }
+
+        .sound-btn.playing {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -529,6 +586,7 @@
 
     <button class="new-note-btn" id="newNoteBtn">+</button>
     <button class="theme-btn" id="themeBtn">🎨</button>
+    <button class="sound-btn" id="soundBtn">🔇</button>
 
     <div class="theme-menu" id="themeMenu">
         <div class="theme-option" data-theme="default">
@@ -566,6 +624,14 @@
         <div class="theme-option" data-theme="coffee">
             <div class="theme-color" style="background: linear-gradient(135deg, #5d4037, #bcaaa4);"></div>
             <span>Coffee</span>
+        </div>
+        <div class="theme-option" data-theme="rain">
+            <div class="theme-color" style="background: linear-gradient(135deg, #1976d2, #90caf9);"></div>
+            <span>Rain 🌧️</span>
+        </div>
+        <div class="theme-option" data-theme="fireplace">
+            <div class="theme-color" style="background: linear-gradient(135deg, #d84315, #ffab91);"></div>
+            <span>Fireplace 🔥</span>
         </div>
     </div>
 
@@ -606,6 +672,17 @@
                 this.currentNoteId = null;
                 this.tags = [];
                 this.currentTheme = localStorage.getItem('theme') || 'default';
+                this.audioContext = null;
+                this.currentSound = null;
+                this.soundPlaying = false;
+                
+                // Define themes with ambient sounds
+                this.themeSounds = {
+                    'ocean': { url: 'https://cdn.freesound.org/previews/393/393878_2627411-lq.mp3', name: 'Ocean Waves' },
+                    'rain': { url: 'https://cdn.freesound.org/previews/523/523277_11389365-lq.mp3', name: 'Rain' },
+                    'forest': { url: 'https://cdn.freesound.org/previews/416/416529_5121236-lq.mp3', name: 'Forest Birds' },
+                    'fireplace': { url: 'https://cdn.freesound.org/previews/242/242747_2615119-lq.mp3', name: 'Fireplace' }
+                };
                 
                 this.initElements();
                 this.initEventListeners();
@@ -629,6 +706,7 @@
                 this.tagContainer = document.getElementById('tagContainer');
                 this.themeBtn = document.getElementById('themeBtn');
                 this.themeMenu = document.getElementById('themeMenu');
+                this.soundBtn = document.getElementById('soundBtn');
             }
 
             initEventListeners() {
@@ -666,12 +744,67 @@
                         this.themeMenu.classList.remove('active');
                     });
                 });
+
+                this.soundBtn.addEventListener('click', () => {
+                    this.toggleSound();
+                });
+            }
+
+            toggleSound() {
+                if (this.soundPlaying) {
+                    this.stopSound();
+                } else {
+                    this.playSound();
+                }
+            }
+
+            playSound() {
+                const soundData = this.themeSounds[this.currentTheme];
+                if (!soundData) return;
+
+                // Stop current sound if any
+                this.stopSound();
+
+                // Create audio element
+                this.currentSound = new Audio(soundData.url);
+                this.currentSound.loop = true;
+                this.currentSound.volume = 0.5;
+
+                // Play sound
+                this.currentSound.play().then(() => {
+                    this.soundPlaying = true;
+                    this.soundBtn.classList.add('playing');
+                    this.soundBtn.textContent = '🔊';
+                }).catch(err => {
+                    console.error('Error playing sound:', err);
+                });
+            }
+
+            stopSound() {
+                if (this.currentSound) {
+                    this.currentSound.pause();
+                    this.currentSound.currentTime = 0;
+                    this.currentSound = null;
+                }
+                this.soundPlaying = false;
+                this.soundBtn.classList.remove('playing');
+                this.soundBtn.textContent = '🔇';
             }
 
             applyTheme(theme) {
+                // Stop current sound when switching themes
+                this.stopSound();
+                
                 this.currentTheme = theme;
                 document.body.setAttribute('data-theme', theme);
                 localStorage.setItem('theme', theme);
+                
+                // Show sound button only for themes with sounds
+                if (this.themeSounds[theme]) {
+                    this.soundBtn.classList.add('active');
+                } else {
+                    this.soundBtn.classList.remove('active');
+                }
                 
                 // Update active state in theme menu
                 document.querySelectorAll('.theme-option').forEach(option => {
