@@ -24,6 +24,22 @@
             color: var(--text-color);
             line-height: 1.5;
             transition: background 0.3s, color 0.3s;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.5s;
         }
 
         /* Default Theme */
@@ -50,11 +66,11 @@
             --delete-color: #ff453a;
         }
 
-        /* Ocean Theme */
+        /* Ocean Theme with animated waves */
         body[data-theme="ocean"] {
             --bg-color: #e0f2f7;
             --text-color: #01579b;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.9);
             --primary-color: #0277bd;
             --secondary-color: #b3e5fc;
             --border-color: #81d4fa;
@@ -62,11 +78,24 @@
             --delete-color: #d32f2f;
         }
 
-        /* Sunset Theme */
+        body[data-theme="ocean"]::before {
+            opacity: 1;
+            background: linear-gradient(180deg, 
+                rgba(129, 212, 250, 0.3) 0%, 
+                rgba(2, 119, 189, 0.2) 100%);
+            animation: oceanWaves 8s ease-in-out infinite;
+        }
+
+        @keyframes oceanWaves {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Sunset Theme with gradient animation */
         body[data-theme="sunset"] {
             --bg-color: #fff3e0;
             --text-color: #bf360c;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.9);
             --primary-color: #ff6f00;
             --secondary-color: #ffe0b2;
             --border-color: #ffcc80;
@@ -74,11 +103,27 @@
             --delete-color: #c62828;
         }
 
-        /* Forest Theme */
+        body[data-theme="sunset"]::before {
+            opacity: 1;
+            background: linear-gradient(45deg, 
+                rgba(255, 111, 0, 0.2), 
+                rgba(255, 193, 7, 0.2),
+                rgba(255, 87, 34, 0.2));
+            background-size: 400% 400%;
+            animation: sunsetGlow 10s ease infinite;
+        }
+
+        @keyframes sunsetGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Forest Theme with leaf particles */
         body[data-theme="forest"] {
             --bg-color: #e8f5e9;
             --text-color: #1b5e20;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.9);
             --primary-color: #2e7d32;
             --secondary-color: #c8e6c9;
             --border-color: #a5d6a7;
@@ -86,11 +131,23 @@
             --delete-color: #c62828;
         }
 
-        /* Purple Dream */
+        body[data-theme="forest"]::before {
+            opacity: 1;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 187, 106, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(46, 125, 50, 0.15) 0%, transparent 50%);
+            animation: forestBreeze 12s ease-in-out infinite;
+        }
+
+        @keyframes forestBreeze {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(10px, -10px); }
+        }
+
+        /* Purple Dream with floating particles */
         body[data-theme="purple"] {
             --bg-color: #f3e5f5;
             --text-color: #4a148c;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.9);
             --primary-color: #7b1fa2;
             --secondary-color: #e1bee7;
             --border-color: #ce93d8;
@@ -98,11 +155,24 @@
             --delete-color: #c62828;
         }
 
-        /* Cyberpunk */
+        body[data-theme="purple"]::before {
+            opacity: 1;
+            background: radial-gradient(circle at 30% 20%, rgba(171, 71, 188, 0.2) 0%, transparent 40%),
+                        radial-gradient(circle at 70% 60%, rgba(123, 31, 162, 0.2) 0%, transparent 40%),
+                        radial-gradient(circle at 50% 90%, rgba(206, 147, 216, 0.2) 0%, transparent 40%);
+            animation: purpleDream 15s ease-in-out infinite;
+        }
+
+        @keyframes purpleDream {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        /* Cyberpunk with glitch effect */
         body[data-theme="cyberpunk"] {
             --bg-color: #0a0e27;
             --text-color: #00ff9f;
-            --card-bg: #1a1d3a;
+            --card-bg: rgba(26, 29, 58, 0.95);
             --primary-color: #ff2e97;
             --secondary-color: #2d3250;
             --border-color: #00ff9f;
@@ -110,11 +180,39 @@
             --delete-color: #ff2e97;
         }
 
-        /* Pastel Pink */
+        body[data-theme="cyberpunk"]::before {
+            opacity: 1;
+            background: 
+                linear-gradient(90deg, transparent 0%, rgba(255, 46, 151, 0.1) 50%, transparent 100%),
+                linear-gradient(0deg, transparent 0%, rgba(0, 255, 159, 0.1) 50%, transparent 100%);
+            background-size: 200% 200%;
+            animation: cyberpunkGlitch 3s linear infinite;
+        }
+
+        @keyframes cyberpunkGlitch {
+            0%, 100% { 
+                background-position: 0% 0%;
+                opacity: 0.8;
+            }
+            25% { 
+                background-position: 100% 100%;
+                opacity: 1;
+            }
+            50% { 
+                background-position: 0% 100%;
+                opacity: 0.6;
+            }
+            75% { 
+                background-position: 100% 0%;
+                opacity: 1;
+            }
+        }
+
+        /* Pastel Pink with floating hearts */
         body[data-theme="pastel"] {
             --bg-color: #fce4ec;
             --text-color: #880e4f;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.9);
             --primary-color: #ec407a;
             --secondary-color: #f8bbd0;
             --border-color: #f48fb1;
@@ -122,11 +220,23 @@
             --delete-color: #c62828;
         }
 
-        /* Coffee Theme */
+        body[data-theme="pastel"]::before {
+            opacity: 1;
+            background: radial-gradient(circle at 25% 25%, rgba(236, 64, 122, 0.15) 0%, transparent 25%),
+                        radial-gradient(circle at 75% 75%, rgba(240, 98, 146, 0.15) 0%, transparent 25%);
+            animation: pastelFloat 10s ease-in-out infinite;
+        }
+
+        @keyframes pastelFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+
+        /* Coffee Theme with steam animation */
         body[data-theme="coffee"] {
             --bg-color: #efebe9;
             --text-color: #3e2723;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.9);
             --primary-color: #5d4037;
             --secondary-color: #d7ccc8;
             --border-color: #bcaaa4;
@@ -134,11 +244,22 @@
             --delete-color: #c62828;
         }
 
-        /* Rain Theme */
+        body[data-theme="coffee"]::before {
+            opacity: 1;
+            background: radial-gradient(ellipse at 50% 100%, rgba(93, 64, 55, 0.1) 0%, transparent 50%);
+            animation: coffeeSteam 6s ease-in-out infinite;
+        }
+
+        @keyframes coffeeSteam {
+            0%, 100% { transform: translateY(0) scaleY(1); opacity: 0.6; }
+            50% { transform: translateY(-30px) scaleY(1.3); opacity: 0.3; }
+        }
+
+        /* Rain Theme with falling drops */
         body[data-theme="rain"] {
             --bg-color: #e3f2fd;
             --text-color: #1565c0;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.9);
             --primary-color: #1976d2;
             --secondary-color: #bbdefb;
             --border-color: #90caf9;
@@ -146,11 +267,22 @@
             --delete-color: #c62828;
         }
 
-        /* Fireplace Theme */
+        body[data-theme="rain"]::before {
+            opacity: 1;
+            background: linear-gradient(180deg, rgba(144, 202, 249, 0.2) 0%, transparent 100%);
+            animation: rainFall 2s linear infinite;
+        }
+
+        @keyframes rainFall {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* Fireplace Theme with flickering glow */
         body[data-theme="fireplace"] {
             --bg-color: #fbe9e7;
             --text-color: #bf360c;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.9);
             --primary-color: #d84315;
             --secondary-color: #ffccbc;
             --border-color: #ffab91;
@@ -158,11 +290,116 @@
             --delete-color: #c62828;
         }
 
+        body[data-theme="fireplace"]::before {
+            opacity: 1;
+            background: radial-gradient(ellipse at 50% 100%, rgba(216, 67, 21, 0.2) 0%, transparent 60%);
+            animation: fireFlicker 1.5s ease-in-out infinite;
+        }
+
+        @keyframes fireFlicker {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            25% { opacity: 1; transform: scale(1.02); }
+            50% { opacity: 0.7; transform: scale(0.98); }
+            75% { opacity: 0.9; transform: scale(1.01); }
+        }
+
+        /* Northern Lights Theme - NEW ANIMATED THEME */
+        body[data-theme="aurora"] {
+            --bg-color: #0d1b2a;
+            --text-color: #00ff88;
+            --card-bg: rgba(13, 27, 42, 0.9);
+            --primary-color: #00ffaa;
+            --secondary-color: #1b263b;
+            --border-color: #00ff88;
+            --muted-color: #66ffc9;
+            --delete-color: #ff006e;
+        }
+
+        body[data-theme="aurora"]::before {
+            opacity: 1;
+            background: 
+                linear-gradient(135deg, 
+                    rgba(0, 255, 136, 0.3) 0%, 
+                    rgba(0, 170, 255, 0.3) 25%,
+                    rgba(170, 0, 255, 0.3) 50%,
+                    rgba(0, 255, 170, 0.3) 75%,
+                    rgba(0, 255, 136, 0.3) 100%);
+            background-size: 400% 400%;
+            animation: auroraBorealis 20s ease infinite;
+        }
+
+        @keyframes auroraBorealis {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 50% 75%; }
+            50% { background-position: 100% 50%; }
+            75% { background-position: 50% 25%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Galaxy Theme - NEW ANIMATED THEME */
+        body[data-theme="galaxy"] {
+            --bg-color: #0b0c1e;
+            --text-color: #e0e0ff;
+            --card-bg: rgba(25, 25, 55, 0.9);
+            --primary-color: #9d4edd;
+            --secondary-color: #1a1a3e;
+            --border-color: #7b2cbf;
+            --muted-color: #c77dff;
+            --delete-color: #ff006e;
+        }
+
+        body[data-theme="galaxy"]::before {
+            opacity: 1;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(157, 78, 221, 0.3) 0%, transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(123, 44, 191, 0.3) 0%, transparent 30%),
+                radial-gradient(circle at 50% 50%, rgba(199, 125, 255, 0.2) 0%, transparent 40%);
+            animation: galaxySpin 30s linear infinite;
+        }
+
+        @keyframes galaxySpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* Neon City Theme - NEW ANIMATED THEME */
+        body[data-theme="neon"] {
+            --bg-color: #1a0033;
+            --text-color: #ff00ff;
+            --card-bg: rgba(40, 0, 80, 0.9);
+            --primary-color: #ff00ff;
+            --secondary-color: #330066;
+            --border-color: #ff00aa;
+            --muted-color: #ff66ff;
+            --delete-color: #ff0055;
+        }
+
+        body[data-theme="neon"]::before {
+            opacity: 1;
+            background: 
+                linear-gradient(90deg, 
+                    rgba(255, 0, 255, 0) 0%,
+                    rgba(255, 0, 255, 0.3) 25%,
+                    rgba(0, 255, 255, 0.3) 50%,
+                    rgba(255, 0, 255, 0.3) 75%,
+                    rgba(255, 0, 255, 0) 100%);
+            background-size: 200% 100%;
+            animation: neonPulse 4s linear infinite;
+        }
+
+        @keyframes neonPulse {
+            0% { background-position: -200% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             padding-bottom: 80px;
+            position: relative;
+            z-index: 1;
         }
 
         header {
@@ -249,6 +486,7 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
+            backdrop-filter: blur(10px);
         }
 
         .note-card:active {
@@ -330,6 +568,7 @@
             overflow-y: auto;
             padding: 24px;
             animation: slideUp 0.3s;
+            backdrop-filter: blur(10px);
         }
 
         @keyframes slideUp {
@@ -502,6 +741,9 @@
             z-index: 99;
             display: none;
             min-width: 180px;
+            max-height: 70vh;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
         }
 
         .theme-menu.active {
@@ -603,7 +845,7 @@
         </div>
         <div class="theme-option" data-theme="sunset">
             <div class="theme-color" style="background: linear-gradient(135deg, #ff6f00, #ffcc80);"></div>
-            <span>Sunset</span>
+            <span>Sunset 🌅</span>
         </div>
         <div class="theme-option" data-theme="forest">
             <div class="theme-color" style="background: linear-gradient(135deg, #2e7d32, #a5d6a7);"></div>
@@ -611,19 +853,19 @@
         </div>
         <div class="theme-option" data-theme="purple">
             <div class="theme-color" style="background: linear-gradient(135deg, #7b1fa2, #ce93d8);"></div>
-            <span>Purple Dream</span>
+            <span>Purple Dream 💜</span>
         </div>
         <div class="theme-option" data-theme="cyberpunk">
             <div class="theme-color" style="background: linear-gradient(135deg, #ff2e97, #00ff9f);"></div>
-            <span>Cyberpunk</span>
+            <span>Cyberpunk ⚡</span>
         </div>
         <div class="theme-option" data-theme="pastel">
             <div class="theme-color" style="background: linear-gradient(135deg, #ec407a, #f8bbd0);"></div>
-            <span>Pastel Pink</span>
+            <span>Pastel Pink 🌸</span>
         </div>
         <div class="theme-option" data-theme="coffee">
             <div class="theme-color" style="background: linear-gradient(135deg, #5d4037, #bcaaa4);"></div>
-            <span>Coffee</span>
+            <span>Coffee ☕</span>
         </div>
         <div class="theme-option" data-theme="rain">
             <div class="theme-color" style="background: linear-gradient(135deg, #1976d2, #90caf9);"></div>
@@ -632,6 +874,18 @@
         <div class="theme-option" data-theme="fireplace">
             <div class="theme-color" style="background: linear-gradient(135deg, #d84315, #ffab91);"></div>
             <span>Fireplace 🔥</span>
+        </div>
+        <div class="theme-option" data-theme="aurora">
+            <div class="theme-color" style="background: linear-gradient(135deg, #00ff88, #00aaff, #aa00ff);"></div>
+            <span>Aurora ✨</span>
+        </div>
+        <div class="theme-option" data-theme="galaxy">
+            <div class="theme-color" style="background: linear-gradient(135deg, #9d4edd, #7b2cbf, #c77dff);"></div>
+            <span>Galaxy 🌌</span>
+        </div>
+        <div class="theme-option" data-theme="neon">
+            <div class="theme-color" style="background: linear-gradient(135deg, #ff00ff, #00ffff);"></div>
+            <span>Neon City 🌃</span>
         </div>
     </div>
 
@@ -691,7 +945,6 @@
                 this.init();
                 this.stop();
                 
-                // Create multiple white noise oscillators at different frequencies to simulate ocean
                 for (let i = 0; i < 3; i++) {
                     const bufferSize = 4096;
                     const whiteNoise = this.audioContext.createScriptProcessor(bufferSize, 1, 1);
@@ -724,7 +977,6 @@
                 this.init();
                 this.stop();
                 
-                // Simulate rain with filtered white noise
                 const bufferSize = 4096;
                 const whiteNoise = this.audioContext.createScriptProcessor(bufferSize, 1, 1);
                 
@@ -755,7 +1007,6 @@
                 this.init();
                 this.stop();
                 
-                // Base ambient sound
                 const bufferSize = 4096;
                 const whiteNoise = this.audioContext.createScriptProcessor(bufferSize, 1, 1);
                 
@@ -777,7 +1028,6 @@
                 filter.connect(gainNode);
                 gainNode.connect(this.audioContext.destination);
                 
-                // Random bird chirps
                 const playChirp = () => {
                     if (!this.isPlaying) return;
                     
@@ -809,14 +1059,12 @@
                 this.init();
                 this.stop();
                 
-                // Crackling fire sound
                 const bufferSize = 4096;
                 const crackle = this.audioContext.createScriptProcessor(bufferSize, 1, 1);
                 
                 crackle.onaudioprocess = function(e) {
                     const output = e.outputBuffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) {
-                        // Random pops and crackles
                         output[i] = (Math.random() > 0.99 ? Math.random() * 0.5 : 0) + 
                                    (Math.random() * 2 - 1) * 0.03;
                     }
@@ -959,21 +1207,18 @@
             }
 
             applyTheme(theme) {
-                // Stop current sound when switching themes
                 this.stopSound();
                 
                 this.currentTheme = theme;
                 document.body.setAttribute('data-theme', theme);
                 localStorage.setItem('theme', theme);
                 
-                // Show sound button only for themes with sounds
                 if (this.themesWithSounds.includes(theme)) {
                     this.soundBtn.classList.add('active');
                 } else {
                     this.soundBtn.classList.remove('active');
                 }
                 
-                // Update active state in theme menu
                 document.querySelectorAll('.theme-option').forEach(option => {
                     if (option.dataset.theme === theme) {
                         option.classList.add('active');
@@ -1114,12 +1359,10 @@
             getFilteredNotes() {
                 let filtered = this.notes;
 
-                // Apply tag filter
                 if (this.currentFilter !== 'all') {
                     filtered = filtered.filter(note => note.tags.includes(this.currentFilter));
                 }
 
-                // Apply search
                 const searchTerm = this.searchBox.value.toLowerCase();
                 if (searchTerm) {
                     filtered = filtered.filter(note => 
@@ -1194,7 +1437,6 @@
             }
         }
 
-        // Initialize app
         new NotesApp();
     </script>
 </body>
